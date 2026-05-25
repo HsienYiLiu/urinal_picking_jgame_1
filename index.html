@@ -1,0 +1,1489 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="男廁大考驗">
+    <title>Jessica 小遊戲1 - 男廁大考驗！</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+            min-height: 100vh;
+            min-height: -webkit-fill-available;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            padding: 20px;
+            padding: env(safe-area-inset-top, 20px) env(safe-area-inset-right, 20px) env(safe-area-inset-bottom, 20px) env(safe-area-inset-left, 20px);
+            -webkit-text-size-adjust: 100%;
+            -webkit-overflow-scrolling: touch;
+            overflow-y: auto;
+        }
+
+        .game-container {
+            max-width: 900px;
+            width: 100%;
+            text-align: center;
+        }
+
+        h1 {
+            font-size: 2.2em;
+            margin-bottom: 10px;
+            text-shadow: 0 0 20px rgba(100, 200, 255, 0.5);
+        }
+
+        .subtitle {
+            font-size: 1.2em;
+            color: #aaa;
+            margin-bottom: 30px;
+        }
+
+        .score-board {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-bottom: 15px;
+            font-size: 1em;
+            flex-wrap: wrap;
+        }
+
+        .score-board span {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 8px 16px;
+            border-radius: 20px;
+        }
+
+        .timer-bar {
+            width: 100%;
+            height: 8px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 4px;
+            margin: 10px 0 20px;
+            overflow: hidden;
+        }
+
+        .timer-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #4caf50, #ffeb3b, #f44336);
+            border-radius: 4px;
+            transition: width 0.1s linear;
+            width: 100%;
+        }
+
+        .timer-fill.urgent {
+            animation: pulse-timer 0.5s infinite;
+        }
+
+        @keyframes pulse-timer {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        .level-info {
+            font-size: 1.1em;
+            color: #ccc;
+            margin-bottom: 10px;
+        }
+
+        .special-info {
+            font-size: 0.9em;
+            color: #ffd700;
+            margin-bottom: 15px;
+            min-height: 22px;
+        }
+
+        .urinal-row {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin: 25px 0;
+            flex-wrap: nowrap;
+            align-items: flex-end;
+        }
+
+        .urinal {
+            width: 65px;
+            height: 105px;
+            background: #e8e8e8;
+            border-radius: 10px 10px 20px 20px;
+            position: relative;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            border: 3px solid #ccc;
+            -webkit-tap-highlight-color: transparent;
+            touch-action: manipulation;
+        }
+
+        @media (max-width: 600px) {
+            body { padding: 15px; justify-content: flex-start; padding-top: 30px; }
+            h1 { font-size: 1.2em; margin-bottom: 6px; }
+            .subtitle { font-size: 1em; margin-bottom: 15px; }
+            .urinal { width: 42px; height: 72px; }
+            .urinal::before { width: 24px; height: 30px; top: 10px; }
+            .urinal::after { width: 11px; height: 9px; top: 3px; }
+            .person { font-size: 22px !important; bottom: -6px !important; }
+            .btn { padding: 14px 32px; font-size: 1.1em; min-height: 50px; }
+            .btn-small { min-height: 44px; padding: 12px 20px; }
+            .score-board { font-size: 0.8em; gap: 6px; }
+            .score-board span { padding: 5px 10px; }
+            .urinal-row { gap: 5px; margin: 15px 0; }
+            .message { font-size: 0.9em; min-height: 32px; margin: 10px 0; }
+            .level-info { font-size: 0.9em; margin-bottom: 5px; }
+            .special-info { font-size: 0.75em; margin-bottom: 8px; }
+            .scenario-text { font-size: 0.8em; margin-bottom: 4px; }
+            .timer-bar { margin: 6px 0 10px; }
+            .leaderboard { padding: 12px; margin-top: 15px; }
+            .leaderboard li { padding: 5px 8px; font-size: 0.85em; }
+            .door-marker { width: 30px; height: 72px; }
+            .door-marker .door-icon { font-size: 20px; }
+            .door-marker .door-label { font-size: 7px; }
+            .divider { height: 60px; width: 4px; }
+            .label { font-size: 8px !important; top: -16px !important; }
+            .tutorial-bubble { padding: 10px 14px; font-size: 0.95em; }
+            .name-input-area input { width: 120px; padding: 10px 12px; }
+            .combo { font-size: 0.75em; }
+            .progress-bar { margin-bottom: 8px; }
+        }
+
+        @media (max-width: 380px) {
+            .urinal { width: 36px; height: 62px; }
+            .urinal::before { width: 20px; height: 26px; top: 8px; }
+            .urinal::after { width: 9px; height: 7px; top: 2px; }
+            .person { font-size: 18px !important; }
+            .urinal-row { gap: 3px; }
+            h1 { font-size: 1em; }
+            .score-board { font-size: 0.75em; }
+            .door-marker { width: 25px; height: 62px; }
+            .door-marker .door-icon { font-size: 16px; }
+        }
+
+        .urinal:hover:not(.occupied):not(.disabled):not(.broken) {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(100, 200, 255, 0.4);
+            border-color: #64c8ff;
+        }
+
+        .urinal:active:not(.occupied):not(.disabled):not(.broken) {
+            transform: scale(0.92);
+            border-color: #64c8ff;
+        }
+
+        .urinal::before {
+            content: '';
+            position: absolute;
+            top: 15px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 36px;
+            height: 45px;
+            background: #fff;
+            border-radius: 5px 5px 18px 18px;
+            border: 2px solid #ddd;
+        }
+
+        .urinal::after {
+            content: '';
+            position: absolute;
+            top: 5px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 18px;
+            height: 14px;
+            background: #ccc;
+            border-radius: 3px;
+        }
+
+        .urinal.occupied {
+            cursor: not-allowed;
+        }
+
+        .urinal.occupied::before {
+            background: #ffcccc;
+            border-color: #ff9999;
+        }
+
+        .urinal.broken {
+            cursor: not-allowed;
+            background: #666;
+            border-color: #444;
+        }
+
+        .urinal.broken::before {
+            background: #555;
+            border-color: #444;
+        }
+
+        .urinal.broken::after {
+            background: #444;
+        }
+
+        .door-marker {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-end;
+            width: 45px;
+            height: 105px;
+            align-self: flex-end;
+        }
+
+        .door-marker .door-icon {
+            font-size: 32px;
+            margin-bottom: 5px;
+        }
+
+        .door-marker .door-label {
+            font-size: 10px;
+            color: #ff9800;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+
+        .divider {
+            width: 6px;
+            height: 90px;
+            background: linear-gradient(180deg, #555, #333);
+            border-radius: 2px;
+            margin: 0 2px;
+            align-self: center;
+        }
+
+        .person {
+            position: absolute;
+            bottom: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 36px;
+            z-index: 2;
+            transition: transform 0.3s;
+        }
+
+        .person.react-uncomfortable {
+            animation: uncomfortable 0.6s ease;
+        }
+
+        .person.react-relieved {
+            animation: relieved 0.6s ease;
+        }
+
+        @keyframes uncomfortable {
+            0% { transform: translateX(-50%) scale(1); }
+            30% { transform: translateX(-50%) scale(1.2) rotate(-5deg); }
+            60% { transform: translateX(-50%) scale(1.2) rotate(5deg); }
+            100% { transform: translateX(-50%) scale(1); }
+        }
+
+        @keyframes relieved {
+            0% { transform: translateX(-50%) scale(1); }
+            50% { transform: translateX(-50%) scale(1.1); }
+            100% { transform: translateX(-50%) scale(1); }
+        }
+
+        .label {
+            position: absolute;
+            top: -22px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 11px;
+            white-space: nowrap;
+            color: #ffd700;
+            font-weight: bold;
+        }
+
+        .urinal.correct {
+            border-color: #4caf50;
+            box-shadow: 0 0 20px rgba(76, 175, 80, 0.6);
+            animation: pulse-green 0.5s ease;
+        }
+
+        .urinal.wrong {
+            border-color: #f44336;
+            box-shadow: 0 0 20px rgba(244, 67, 54, 0.6);
+            animation: shake 0.4s ease;
+        }
+
+        .urinal.best {
+            border-color: #4caf50;
+            box-shadow: 0 0 20px rgba(76, 175, 80, 0.6);
+        }
+
+        .urinal.disabled {
+            cursor: default;
+        }
+
+        @keyframes pulse-green {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            75% { transform: translateX(5px); }
+        }
+
+        .message {
+            font-size: 1.2em;
+            min-height: 40px;
+            margin: 15px 0;
+            transition: opacity 0.3s;
+        }
+
+        .message.success { color: #4caf50; }
+        .message.fail { color: #f44336; }
+        .message.info { color: #64c8ff; }
+        .message.timeout { color: #ff9800; }
+
+        .btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 14px 40px;
+            font-size: 1.1em;
+            border-radius: 30px;
+            cursor: pointer;
+            transition: transform 0.1s, box-shadow 0.2s;
+            margin-top: 15px;
+            -webkit-tap-highlight-color: transparent;
+            touch-action: manipulation;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(102, 126, 234, 0.5);
+        }
+
+        .btn:active {
+            transform: scale(0.95);
+        }
+
+        .start-screen, .end-screen {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .end-screen .final-score {
+            font-size: 3em;
+            margin: 20px 0;
+            text-shadow: 0 0 30px rgba(100, 200, 255, 0.5);
+        }
+
+        .end-screen .grade {
+            font-size: 1.5em;
+            margin-bottom: 20px;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 6px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 3px;
+            margin-bottom: 15px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea, #764ba2);
+            border-radius: 3px;
+            transition: width 0.3s ease;
+        }
+
+        .combo {
+            font-size: 0.9em;
+            color: #ffd700;
+            min-height: 20px;
+        }
+
+        /* Tutorial styles */
+        .tutorial-bubble {
+            background: rgba(100, 200, 255, 0.15);
+            border: 1px solid rgba(100, 200, 255, 0.4);
+            border-radius: 15px;
+            padding: 15px 25px;
+            margin-bottom: 20px;
+            font-size: 1.1em;
+            color: #e0f0ff;
+            animation: fadeIn 0.4s ease;
+        }
+
+        .tutorial-bubble strong {
+            color: #64c8ff;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .new-element-tooltip {
+            position: absolute;
+            top: -45px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #ffd700;
+            color: #333;
+            padding: 4px 10px;
+            border-radius: 8px;
+            font-size: 10px;
+            font-weight: bold;
+            white-space: nowrap;
+            animation: bounce 1s infinite;
+            z-index: 10;
+        }
+
+        .new-element-tooltip::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 0;
+            height: 0;
+            border-left: 5px solid transparent;
+            border-right: 5px solid transparent;
+            border-top: 5px solid #ffd700;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateX(-50%) translateY(0); }
+            50% { transform: translateX(-50%) translateY(-5px); }
+        }
+
+        .reaction-bubble {
+            position: absolute;
+            top: -35px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 20px;
+            animation: floatUp 1.5s ease forwards;
+            z-index: 10;
+        }
+
+        @keyframes floatUp {
+            0% { opacity: 1; transform: translateX(-50%) translateY(0); }
+            100% { opacity: 0; transform: translateX(-50%) translateY(-30px); }
+        }
+
+        /* Leaderboard styles */
+        .leaderboard {
+            margin-top: 25px;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            text-align: left;
+            max-width: 400px;
+            width: 100%;
+        }
+
+        .leaderboard h3 {
+            text-align: center;
+            margin-bottom: 12px;
+            color: #ffd700;
+            font-size: 1.1em;
+        }
+
+        .leaderboard-empty {
+            text-align: center;
+            color: #666;
+            font-style: italic;
+            padding: 10px;
+        }
+
+        .leaderboard ol {
+            list-style: none;
+            padding: 0;
+        }
+
+        .leaderboard li {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 12px;
+            border-radius: 8px;
+            margin-bottom: 4px;
+            transition: background 0.2s;
+        }
+
+        .leaderboard li:nth-child(1) {
+            background: rgba(255, 215, 0, 0.15);
+        }
+
+        .leaderboard li:nth-child(2) {
+            background: rgba(192, 192, 192, 0.1);
+        }
+
+        .leaderboard li:nth-child(3) {
+            background: rgba(205, 127, 50, 0.1);
+        }
+
+        .leaderboard li.highlight {
+            background: rgba(100, 200, 255, 0.2);
+            border: 1px solid rgba(100, 200, 255, 0.4);
+        }
+
+        .leaderboard .rank {
+            font-weight: bold;
+            width: 30px;
+            color: #aaa;
+        }
+
+        .leaderboard .name {
+            flex: 1;
+            color: #eee;
+        }
+
+        .leaderboard .lb-score {
+            font-weight: bold;
+            color: #64c8ff;
+        }
+
+        .leaderboard .date {
+            font-size: 0.75em;
+            color: #666;
+            margin-left: 10px;
+        }
+
+        .name-input-area {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            align-items: center;
+            margin-top: 15px;
+            flex-wrap: wrap;
+        }
+
+        .name-input-area input {
+            padding: 10px 16px;
+            border-radius: 20px;
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            background: rgba(255, 255, 255, 0.1);
+            color: #fff;
+            font-size: 1em;
+            outline: none;
+            width: 160px;
+            text-align: center;
+        }
+
+        .name-input-area input::placeholder {
+            color: #888;
+        }
+
+        .name-input-area input:focus {
+            border-color: #64c8ff;
+        }
+
+        .btn-small {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            font-size: 0.95em;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .btn-small:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 3px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-clear {
+            background: rgba(255, 255, 255, 0.1);
+            color: #999;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            padding: 6px 14px;
+            font-size: 0.8em;
+            border-radius: 15px;
+            cursor: pointer;
+            margin-top: 12px;
+            transition: background 0.2s;
+        }
+
+        .btn-clear:hover {
+            background: rgba(255, 80, 80, 0.2);
+            color: #ff8888;
+        }
+
+        .new-record {
+            color: #ffd700;
+            font-size: 1.1em;
+            animation: pulse-gold 1s infinite;
+            margin-top: 10px;
+        }
+
+        @keyframes pulse-gold {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.6; }
+        }
+
+        .confetti-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 9999;
+            overflow: hidden;
+        }
+
+        .confetti {
+            position: absolute;
+            top: -10px;
+            width: 10px;
+            height: 10px;
+            border-radius: 2px;
+            animation: confetti-fall linear forwards;
+        }
+
+        @keyframes confetti-fall {
+            to {
+                transform: translateY(100vh) rotate(720deg);
+                opacity: 0;
+            }
+        }
+
+        .scenario-text {
+            font-size: 0.95em;
+            color: #ffcc80;
+            font-style: italic;
+            margin-bottom: 8px;
+            min-height: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="game-container">
+        <!-- Start Screen -->
+        <div id="start-screen" class="start-screen">
+            <h1>🚽 Jessica 小遊戲1 - 男廁大考驗 (Urinal Etiquette)</h1>
+            <p class="subtitle">Pick the least awkward urinal. Simple!</p>
+            <p style="color:#888; margin-bottom:20px; font-size:0.95em;">You'll learn the rules as you play. No stress.</p>
+            <button class="btn" onclick="playGame()">Play</button>
+            <div class="leaderboard" id="start-leaderboard"></div>
+        </div>
+
+        <!-- Tutorial Screen -->
+        <div id="tutorial-screen" class="hidden">
+            <h1>🚽 Jessica 小遊戲1 - 男廁大考驗 (Urinal Etiquette)</h1>
+            <div class="tutorial-bubble" id="tutorial-bubble"></div>
+            <div class="urinal-row" id="tutorial-row"></div>
+            <div class="message" id="tutorial-message"></div>
+            <button class="btn hidden" id="tutorial-next-btn" onclick="nextTutorialStep()">Got it!</button>
+        </div>
+
+        <!-- Game Screen -->
+        <div id="game-screen" class="hidden">
+            <h1>🚽 Jessica 小遊戲1 - 男廁大考驗 (Urinal Etiquette)</h1>
+            <div class="progress-bar">
+                <div class="progress-fill" id="progress-fill"></div>
+            </div>
+            <div class="score-board">
+                <span>✅ Score: <strong id="score">0</strong></span>
+                <span>🔥 Streak: <strong id="streak">0</strong></span>
+                <span>❓ Round: <strong id="round">1</strong>/15</span>
+            </div>
+            <div class="timer-bar">
+                <div class="timer-fill" id="timer-fill"></div>
+            </div>
+            <p class="scenario-text" id="scenario-text"></p>
+            <p class="level-info" id="level-info"></p>
+            <p class="special-info" id="special-info"></p>
+            <div class="urinal-row" id="urinal-row"></div>
+            <div class="combo" id="combo"></div>
+            <div class="message" id="message"></div>
+            <button class="btn hidden" id="next-btn" onclick="nextRound()">Next Round</button>
+        </div>
+
+        <!-- End Screen -->
+        <div id="end-screen" class="end-screen hidden">
+            <h1>🚽 遊戲結束！</h1>
+            <div class="final-score" id="final-score">0</div>
+            <div class="grade" id="grade"></div>
+            <p id="end-message"></p>
+            <p style="margin-top:10px;color:#aaa;" id="end-stats"></p>
+            <p class="new-record hidden" id="new-record">🎉 New High Score!</p>
+            <div class="name-input-area" id="name-input-area">
+                <input type="text" id="player-name" placeholder="Your name" maxlength="12" />
+                <button class="btn-small" onclick="saveScore()">Save Score</button>
+            </div>
+            <div class="leaderboard" id="end-leaderboard"></div>
+            <p style="margin-top:18px; color:#ff69b4; font-size:0.9em; opacity:0.8;">Love you Jessica &lt;3</p>
+            <button class="btn" onclick="playGame()">Play Again</button>
+        </div>
+    </div>
+
+    <script>
+        const TOTAL_ROUNDS = 15;
+        let currentRound = 0;
+        let score = 0;
+        let streak = 0;
+        let maxStreak = 0;
+        let correctCount = 0;
+        let levels = [];
+        let timerInterval = null;
+        let timeLeft = 0;
+        let roundStartTime = 0;
+        let seenElements = { broken: false, divider: false, door: false };
+        let hasPlayedBefore = localStorage.getItem('urinal_game_played') === 'true';
+
+        const SCENARIOS = [
+            "Monday morning. Office bathroom. You just had 2 coffees...",
+            "Halftime at the stadium. Everyone rushes in at once.",
+            "Airport terminal. Your flight boards in 5 minutes.",
+            "Movie theater. You've been holding it since the previews.",
+            "Club at 2am. The bass is still thumping.",
+            "Rest stop on a road trip. The energy drink hit.",
+            "Gym bathroom. Post leg day. Hurry up.",
+            "Wedding reception. You skipped the speeches for this.",
+            "Shopping mall. The food court combo is fighting back.",
+            "Music festival. This is the cleanest bathroom you've found.",
+            "Work Christmas party. Your boss is 2 urinals away...",
+            "University library floor. Exam stress is real.",
+            "Train station. 3 minutes until your platform leaves.",
+            "Bar after happy hour. Third beer was a mistake.",
+            "Hotel lobby. Checking out in 2 minutes.",
+        ];
+
+        const SUCCESS_MESSAGES = [
+            "Smooth operator!",
+            "A true gentleman!",
+            "Perfect positioning!",
+            "Etiquette master!",
+            "No awkwardness detected!",
+            "Socially aware king!",
+            "The bathroom is safe with you.",
+            "Zero awkward eye contact risk!",
+            "Your bathroom IQ is off the charts.",
+            "Legendary spacing!",
+        ];
+
+        const FAIL_MESSAGES = [
+            "Bro... why there?",
+            "That guy is NOT comfortable right now.",
+            "Awkward...",
+            "You just made it weird.",
+            "Social awareness: loading...",
+            "Everyone's staring at the wall extra hard now.",
+            "The silence just got louder.",
+            "That's a bold choice, friend.",
+        ];
+
+        function randomFrom(arr) {
+            return arr[Math.floor(Math.random() * arr.length)];
+        }
+
+        function playGame() {
+            if (hasPlayedBefore) {
+                startGame();
+            } else {
+                startTutorial();
+            }
+        }
+
+        function spawnConfetti(count) {
+            const container = document.createElement('div');
+            container.className = 'confetti-container';
+            document.body.appendChild(container);
+
+            const colors = ['#ff6b6b', '#ffd700', '#4caf50', '#64c8ff', '#ff69b4', '#a855f7'];
+            for (let i = 0; i < count; i++) {
+                const piece = document.createElement('div');
+                piece.className = 'confetti';
+                piece.style.left = Math.random() * 100 + '%';
+                piece.style.background = colors[Math.floor(Math.random() * colors.length)];
+                piece.style.animationDuration = (1.5 + Math.random() * 2) + 's';
+                piece.style.animationDelay = Math.random() * 0.5 + 's';
+                piece.style.width = (6 + Math.random() * 8) + 'px';
+                piece.style.height = (6 + Math.random() * 8) + 'px';
+                container.appendChild(piece);
+            }
+
+            setTimeout(() => container.remove(), 4000);
+        }
+
+        const PERSON_TYPES = {
+            normal: { emoji: '🧑', label: '', extraDistance: 0 },
+        };
+
+        // ========== TUTORIAL ==========
+        let tutorialStep = 0;
+        const tutorialSteps = [
+            {
+                text: "<strong>Rule #1:</strong> Never go <strong>directly next to someone</strong>! Keep at least 1 space buffer.",
+                positions: [false, false, true, false, false],
+                broken: [false, false, false, false, false],
+                dividers: [false, false, false, false, false],
+                personTypes: [null, null, 'normal', null, null],
+                doorSide: null,
+                best: [0, 4],
+            },
+            {
+                text: "<strong>Rule #2:</strong> Multiple safe spots? Prefer the <strong>end</strong> — wall on one side = more privacy!",
+                positions: [false, false, true, false, false, false],
+                broken: [false, false, false, false, false, false],
+                dividers: [false, false, false, false, false, false],
+                personTypes: [null, null, 'normal', null, null, null],
+                doorSide: null,
+                best: [5],
+            },
+            {
+                text: "<strong>Rule #3:</strong> Pick the safe spot <strong>closest to the door</strong> — less walking!",
+                positions: [false, false, true, false, false],
+                broken: [false, false, false, false, false],
+                dividers: [false, false, false, false, false],
+                personTypes: [null, null, 'normal', null, null],
+                doorSide: 'left',
+                best: [0],
+            },
+        ];
+
+        function startTutorial() {
+            tutorialStep = 0;
+            seenElements = { broken: false, divider: false, door: false };
+            hideAll();
+            document.getElementById('tutorial-screen').classList.remove('hidden');
+            showTutorialStep();
+        }
+
+        function showTutorialStep() {
+            const step = tutorialSteps[tutorialStep];
+            document.getElementById('tutorial-bubble').innerHTML = step.text;
+            document.getElementById('tutorial-message').textContent = '';
+            document.getElementById('tutorial-message').className = 'message';
+            document.getElementById('tutorial-next-btn').classList.add('hidden');
+
+            const row = document.getElementById('tutorial-row');
+            row.innerHTML = '';
+
+            // Door on left
+            if (step.doorSide === 'left') {
+                const door = document.createElement('div');
+                door.className = 'door-marker';
+                door.innerHTML = '<span class="door-icon">🚪</span><span class="door-label">Door</span>';
+                row.appendChild(door);
+            }
+
+            step.positions.forEach((occupied, index) => {
+                const urinal = document.createElement('div');
+                let classes = 'urinal';
+                if (occupied) classes += ' occupied';
+                if (step.broken[index]) classes += ' broken';
+                urinal.className = classes;
+
+                if (occupied) {
+                    const person = document.createElement('span');
+                    person.className = 'person';
+                    person.textContent = PERSON_TYPES[step.personTypes[index]].emoji;
+                    urinal.appendChild(person);
+                } else if (!step.broken[index]) {
+                    urinal.addEventListener('click', () => tutorialSelect(index));
+                }
+
+                row.appendChild(urinal);
+
+                if (step.dividers[index] && index < step.positions.length - 1) {
+                    const div = document.createElement('div');
+                    div.className = 'divider';
+                    row.appendChild(div);
+                }
+            });
+
+            // Door on right
+            if (step.doorSide === 'right') {
+                const door = document.createElement('div');
+                door.className = 'door-marker';
+                door.innerHTML = '<span class="door-icon">🚪</span><span class="door-label">Door</span>';
+                row.appendChild(door);
+            }
+        }
+
+        function tutorialSelect(index) {
+            const step = tutorialSteps[tutorialStep];
+            const urinals = document.getElementById('tutorial-row').querySelectorAll('.urinal');
+            const msg = document.getElementById('tutorial-message');
+
+            urinals.forEach(u => {
+                u.classList.add('disabled');
+                u.style.pointerEvents = 'none';
+            });
+
+            if (step.best.includes(index)) {
+                urinals[index].classList.add('correct');
+                msg.textContent = '✅ You got it! Nice instincts!';
+                msg.className = 'message success';
+                addReactions(urinals, step, true);
+            } else {
+                urinals[index].classList.add('wrong');
+                step.best.forEach(bp => urinals[bp].classList.add('best'));
+                msg.textContent = '❌ The green one is better — check the rule above!';
+                msg.className = 'message fail';
+                addReactions(urinals, step, false);
+            }
+
+            document.getElementById('tutorial-next-btn').classList.remove('hidden');
+        }
+
+        function nextTutorialStep() {
+            tutorialStep++;
+            if (tutorialStep >= tutorialSteps.length) {
+                startGame();
+            } else {
+                showTutorialStep();
+            }
+        }
+
+        // ========== MAIN GAME ==========
+        function getTimerDuration(round) {
+            return Math.max(8000, 15000 - round * 500);
+        }
+
+        function generateLevels() {
+            levels = [];
+            for (let i = 0; i < TOTAL_ROUNDS; i++) {
+                levels.push(generateLevel(i));
+            }
+        }
+
+        function generateLevel(roundIndex) {
+            const urinalCount = Math.min(5 + Math.floor(roundIndex / 2), 7);
+
+            for (let retry = 0; retry < 20; retry++) {
+                let positions = new Array(urinalCount).fill(false);
+                let broken = new Array(urinalCount).fill(false);
+                let dividers = new Array(urinalCount).fill(false);
+                let personTypes = new Array(urinalCount).fill(null);
+
+                let doorSide = null;
+                if (roundIndex >= 2) {
+                    doorSide = Math.random() < 0.5 ? 'left' : 'right';
+                }
+
+                // Broken: max 1, only from round 6+
+                if (roundIndex >= 6) {
+                    const pos = Math.floor(Math.random() * urinalCount);
+                    broken[pos] = true;
+                }
+
+                // Dividers
+                if (roundIndex >= 3) {
+                    const dividerCount = Math.min(Math.floor((roundIndex - 2) / 4), 2);
+                    let placed = 0, attempts = 0;
+                    while (placed < dividerCount && attempts < 30) {
+                        const pos = Math.floor(Math.random() * (urinalCount - 1));
+                        if (!dividers[pos]) { dividers[pos] = true; placed++; }
+                        attempts++;
+                    }
+                }
+
+                // People: always leave at least 2 free spots
+                const maxOccupied = Math.max(1, urinalCount - broken.filter(b => b).length - 2);
+                const occupiedCount = Math.min(1 + Math.floor(roundIndex / 3), maxOccupied);
+
+                let placed = 0, attempts = 0;
+                while (placed < occupiedCount && attempts < 50) {
+                    const pos = Math.floor(Math.random() * urinalCount);
+                    if (!positions[pos] && !broken[pos]) {
+                        positions[pos] = true;
+                        personTypes[pos] = 'normal';
+                        placed++;
+                    }
+                    attempts++;
+                }
+
+                const bestPositions = findBestPositions(positions, broken, dividers, personTypes, doorSide, urinalCount);
+                if (bestPositions.length > 0) {
+                    return { positions, broken, dividers, personTypes, bestPositions, urinalCount, doorSide };
+                }
+            }
+
+            // Fallback: simple level
+            let positions = [true, false, false, false, false];
+            let broken = [false, false, false, false, false];
+            let dividers = [false, false, false, false, false];
+            let personTypes = ['normal', null, null, null, null];
+            const bestPositions = findBestPositions(positions, broken, dividers, personTypes, null, 5);
+            return { positions, broken, dividers, personTypes, bestPositions, urinalCount: 5, doorSide: null };
+        }
+
+        function findBestPositions(positions, broken, dividers, personTypes, doorSide, urinalCount) {
+            const available = [];
+            for (let i = 0; i < positions.length; i++) {
+                if (!positions[i] && !broken[i]) available.push(i);
+            }
+            if (available.length === 0) return [];
+
+            let bestScore = -Infinity;
+            let best = [];
+
+            for (const pos of available) {
+                const s = calcScore(pos, positions, broken, dividers, personTypes, doorSide, urinalCount);
+                if (s > bestScore) { bestScore = s; best = [pos]; }
+                else if (s === bestScore) { best.push(pos); }
+            }
+            return best;
+        }
+
+        function calcScore(pos, positions, broken, dividers, personTypes, doorSide, urinalCount) {
+            let minDist = Infinity;
+
+            for (let i = 0; i < positions.length; i++) {
+                if (positions[i]) {
+                    let dist = Math.abs(pos - i);
+                    const type = PERSON_TYPES[personTypes[i]];
+                    let effectiveDist = dist - type.extraDistance;
+
+                    let hasDivider = false;
+                    const lo = Math.min(pos, i), hi = Math.max(pos, i);
+                    for (let d = lo; d < hi; d++) {
+                        if (dividers[d]) { hasDivider = true; break; }
+                    }
+
+                    if (hasDivider) effectiveDist += 1;
+
+                    minDist = Math.min(minDist, effectiveDist);
+                }
+            }
+
+            // Effective distance: 2+ is comfortable, 1 is awkward, 0 is terrible
+            // Once you have 2+ buffer, extra distance barely matters
+            let s;
+            if (minDist <= 0) {
+                s = -1000;
+            } else if (minDist === 1) {
+                s = 0;
+            } else {
+                // 2+ spaces: all adequate. Small bonus for more distance but capped.
+                s = 200 + Math.min(minDist - 2, 2) * 10;
+            }
+
+            // Prefer closer to door (men are lazy, less walking)
+            if (doorSide) {
+                const doorPos = doorSide === 'left' ? -1 : urinalCount;
+                const doorDist = Math.abs(pos - doorPos);
+                s += (urinalCount - doorDist) * 15;
+            }
+
+            // End positions preferred (more privacy, wall on one side)
+            if (pos === 0 || pos === positions.length - 1) {
+                s += 30;
+            }
+
+            return s;
+        }
+
+        function startGame() {
+            currentRound = 0;
+            score = 0;
+            streak = 0;
+            maxStreak = 0;
+            correctCount = 0;
+            seenElements = { broken: false, divider: false, door: false };
+            hasPlayedBefore = true;
+            localStorage.setItem('urinal_game_played', 'true');
+            generateLevels();
+            hideAll();
+            document.getElementById('game-screen').classList.remove('hidden');
+            showRound();
+        }
+
+        function startTimer() {
+            const duration = getTimerDuration(currentRound);
+            timeLeft = duration;
+            roundStartTime = Date.now();
+            const timerFill = document.getElementById('timer-fill');
+            timerFill.style.width = '100%';
+            timerFill.classList.remove('urgent');
+
+            if (timerInterval) clearInterval(timerInterval);
+            timerInterval = setInterval(() => {
+                const elapsed = Date.now() - roundStartTime;
+                const pct = Math.max(0, 1 - elapsed / duration) * 100;
+                timerFill.style.width = pct + '%';
+                if (pct < 30) timerFill.classList.add('urgent');
+                if (pct <= 0) { clearInterval(timerInterval); timeUp(); }
+            }, 50);
+        }
+
+        function timeUp() {
+            const level = levels[currentRound];
+            const urinals = document.querySelectorAll('#urinal-row .urinal');
+            const msg = document.getElementById('message');
+
+            urinals.forEach(u => { u.classList.add('disabled'); u.style.pointerEvents = 'none'; });
+            level.bestPositions.forEach(bp => urinals[bp].classList.add('best'));
+
+            msg.textContent = "⏰ Time's up! The answer is highlighted in green.";
+            msg.className = 'message timeout';
+            document.getElementById('next-btn').classList.remove('hidden');
+            document.getElementById('combo').textContent = '';
+        }
+
+        function showRound() {
+            const level = levels[currentRound];
+            document.getElementById('score').textContent = score;
+            document.getElementById('streak').textContent = streak;
+            document.getElementById('round').textContent = currentRound + 1;
+            document.getElementById('progress-fill').style.width = ((currentRound) / TOTAL_ROUNDS * 100) + '%';
+            document.getElementById('message').textContent = '';
+            document.getElementById('message').className = 'message';
+            document.getElementById('next-btn').classList.add('hidden');
+            document.getElementById('combo').textContent = '';
+
+            const available = level.positions.filter((p, i) => !p && !level.broken[i]).length;
+            document.getElementById('scenario-text').textContent = SCENARIOS[currentRound % SCENARIOS.length];
+            document.getElementById('level-info').textContent = `Round ${currentRound + 1} — Pick the best spot!`;
+
+            // Check for new elements and show hints
+            const specials = [];
+            if (level.doorSide && !seenElements.door) {
+                specials.push('🚪 NEW: Door! Pick the safe spot closest to it — less walking!');
+                seenElements.door = true;
+            }
+            if (level.broken.some(b => b) && !seenElements.broken) {
+                specials.push('🚫 NEW: Grey = broken, can\'t use it!');
+                seenElements.broken = true;
+            }
+            if (level.dividers.some(d => d) && !seenElements.divider) {
+                specials.push('🧱 NEW: Dividers block the view — adjacent is less awkward!');
+                seenElements.divider = true;
+            }
+            document.getElementById('special-info').textContent = specials.join('  ');
+
+            const row = document.getElementById('urinal-row');
+            row.innerHTML = '';
+
+            // Door on left
+            if (level.doorSide === 'left') {
+                const door = document.createElement('div');
+                door.className = 'door-marker';
+                door.innerHTML = '<span class="door-icon">🚪</span><span class="door-label">Door</span>';
+                row.appendChild(door);
+            }
+
+            level.positions.forEach((occupied, index) => {
+                const urinal = document.createElement('div');
+                let classes = 'urinal';
+                if (occupied) classes += ' occupied';
+                if (level.broken[index]) classes += ' broken';
+                urinal.className = classes;
+
+                if (occupied) {
+                    const person = document.createElement('span');
+                    person.className = 'person';
+                    const pType = PERSON_TYPES[level.personTypes[index]];
+                    person.textContent = pType.emoji;
+                    urinal.appendChild(person);
+
+                    if (pType.label) {
+                        const lbl = document.createElement('span');
+                        lbl.className = 'label';
+                        lbl.textContent = pType.label;
+                        urinal.appendChild(lbl);
+                    }
+                } else if (level.broken[index]) {
+                    const lbl = document.createElement('span');
+                    lbl.className = 'label';
+                    lbl.textContent = '🚫';
+                    urinal.appendChild(lbl);
+                } else {
+                    urinal.addEventListener('click', () => selectUrinal(index));
+                }
+
+                row.appendChild(urinal);
+
+                if (level.dividers[index] && index < level.positions.length - 1) {
+                    const div = document.createElement('div');
+                    div.className = 'divider';
+                    row.appendChild(div);
+                }
+            });
+
+            // Door on right
+            if (level.doorSide === 'right') {
+                const door = document.createElement('div');
+                door.className = 'door-marker';
+                door.innerHTML = '<span class="door-icon">🚪</span><span class="door-label">Door</span>';
+                row.appendChild(door);
+            }
+
+            startTimer();
+        }
+
+        function addReactions(urinals, level, wasCorrect) {
+            urinals.forEach((u, i) => {
+                if (level.positions[i]) {
+                    const person = u.querySelector('.person');
+                    if (person) {
+                        if (wasCorrect) {
+                            person.classList.add('react-relieved');
+                            addBubble(u, '😌');
+                        } else {
+                            person.classList.add('react-uncomfortable');
+                            addBubble(u, '😬');
+                        }
+                    }
+                }
+            });
+        }
+
+        function addBubble(urinal, emoji) {
+            const bubble = document.createElement('span');
+            bubble.className = 'reaction-bubble';
+            bubble.textContent = emoji;
+            urinal.appendChild(bubble);
+            setTimeout(() => bubble.remove(), 1500);
+        }
+
+        function selectUrinal(index) {
+            if (timerInterval) clearInterval(timerInterval);
+
+            const level = levels[currentRound];
+            const urinals = document.querySelectorAll('#urinal-row .urinal');
+            const msg = document.getElementById('message');
+            const comboEl = document.getElementById('combo');
+
+            urinals.forEach(u => { u.classList.add('disabled'); u.style.pointerEvents = 'none'; });
+
+            const elapsed = Date.now() - roundStartTime;
+            const duration = getTimerDuration(currentRound);
+            const timeBonus = Math.max(0, Math.floor((1 - elapsed / duration) * 5));
+
+            // Check if pick has adequate buffer (2+ effective distance)
+            const pickScore = calcScore(index, level.positions, level.broken, level.dividers, level.personTypes, level.doorSide, level.urinalCount);
+            const isOptimal = level.bestPositions.includes(index);
+            const isAdequate = pickScore >= 200; // 200 = has 2+ buffer
+
+            if (isOptimal) {
+                const roundScore = 10 + timeBonus + streak * 2 + 5; // +5 perfect bonus
+                score += roundScore;
+                streak++;
+                correctCount++;
+                if (streak > maxStreak) maxStreak = streak;
+                urinals[index].classList.add('correct');
+
+                let bonusText = '';
+                if (timeBonus > 0) bonusText += ` ⚡+${timeBonus}`;
+                if (streak > 1) bonusText += ` 🔥+${streak * 2}`;
+
+                msg.textContent = `✅ ${randomFrom(SUCCESS_MESSAGES)} +${roundScore}${bonusText}`;
+                msg.className = 'message success';
+
+                if (streak >= 3) {
+                    comboEl.textContent = `🔥 ${streak}x Streak!`;
+                    if (streak === 5) spawnConfetti(30);
+                    if (streak === 10) spawnConfetti(60);
+                }
+
+                addReactions(urinals, level, true);
+            } else if (isAdequate) {
+                // Good enough! You have buffer, just not the perfect spot
+                const roundScore = 7 + timeBonus + Math.floor(streak * 1.5);
+                score += roundScore;
+                streak++;
+                correctCount++;
+                if (streak > maxStreak) maxStreak = streak;
+                urinals[index].classList.add('correct');
+                level.bestPositions.forEach(bp => urinals[bp].classList.add('best'));
+
+                msg.textContent = `👍 Safe pick! +${roundScore} (green = optimal for extra pts)`;
+                msg.className = 'message success';
+
+                if (streak >= 3) comboEl.textContent = `🔥 ${streak}x Streak!`;
+
+                addReactions(urinals, level, true);
+            } else {
+                urinals[index].classList.add('wrong');
+                level.bestPositions.forEach(bp => urinals[bp].classList.add('best'));
+                streak = 0;
+
+                msg.textContent = `❌ ${randomFrom(FAIL_MESSAGES)}`;
+                msg.className = 'message fail';
+                comboEl.textContent = '';
+
+                addReactions(urinals, level, false);
+            }
+
+            document.getElementById('score').textContent = score;
+            document.getElementById('streak').textContent = streak;
+            document.getElementById('next-btn').classList.remove('hidden');
+        }
+
+        function nextRound() {
+            currentRound++;
+            if (currentRound >= TOTAL_ROUNDS) endGame();
+            else showRound();
+        }
+
+        function endGame() {} // replaced below in leaderboard section
+
+        function hideAll() {
+            document.getElementById('start-screen').classList.add('hidden');
+            document.getElementById('tutorial-screen').classList.add('hidden');
+            document.getElementById('game-screen').classList.add('hidden');
+            document.getElementById('end-screen').classList.add('hidden');
+        }
+
+        // ========== LEADERBOARD ==========
+        const STORAGE_KEY = 'urinal_game_scores';
+        const MAX_SCORES = 10;
+
+        function getScores() {
+            try {
+                return JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
+            } catch { return []; }
+        }
+
+        function saveScores(scores) {
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(scores));
+        }
+
+        function isNewHighScore(pts) {
+            const scores = getScores();
+            if (scores.length < MAX_SCORES) return true;
+            return pts > scores[scores.length - 1].score;
+        }
+
+        function saveScore() {
+            const nameInput = document.getElementById('player-name');
+            const name = nameInput.value.trim() || 'Anonymous';
+            const scores = getScores();
+
+            scores.push({
+                name: name,
+                score: score,
+                correct: correctCount,
+                streak: maxStreak,
+                date: new Date().toLocaleDateString()
+            });
+
+            scores.sort((a, b) => b.score - a.score);
+            if (scores.length > MAX_SCORES) scores.length = MAX_SCORES;
+            saveScores(scores);
+
+            document.getElementById('name-input-area').classList.add('hidden');
+            renderLeaderboard('end-leaderboard', score);
+
+            // Remember name for next time
+            localStorage.setItem('urinal_game_last_name', name);
+        }
+
+        function renderLeaderboard(elementId, highlightScore) {
+            const scores = getScores();
+            const el = document.getElementById(elementId);
+
+            if (scores.length === 0) {
+                el.innerHTML = '<h3>🏆 Leaderboard</h3><p class="leaderboard-empty">No scores yet. Be the first!</p>';
+                return;
+            }
+
+            const medals = ['🥇', '🥈', '🥉'];
+            let html = '<h3>🏆 Leaderboard</h3><ol>';
+
+            let highlighted = false;
+            scores.forEach((entry, i) => {
+                const isHighlight = !highlighted && highlightScore !== undefined && entry.score === highlightScore;
+                if (isHighlight) highlighted = true;
+
+                html += `<li class="${isHighlight ? 'highlight' : ''}">
+                    <span class="rank">${medals[i] || (i + 1)}</span>
+                    <span class="name">${escapeHtml(entry.name)}</span>
+                    <span class="lb-score">${entry.score} pts</span>
+                    <span class="date">${entry.date}</span>
+                </li>`;
+            });
+
+            html += '</ol>';
+            html += `<div style="text-align:center"><button class="btn-clear" onclick="clearScores()">Clear All Scores</button></div>`;
+            el.innerHTML = html;
+        }
+
+        function clearScores() {
+            if (confirm('Clear all scores? This cannot be undone.')) {
+                localStorage.removeItem(STORAGE_KEY);
+                renderLeaderboard('start-leaderboard');
+                renderLeaderboard('end-leaderboard');
+            }
+        }
+
+        function escapeHtml(str) {
+            const div = document.createElement('div');
+            div.textContent = str;
+            return div.innerHTML;
+        }
+
+        // Update endGame to show leaderboard
+        const originalEndGame = endGame;
+        endGame = function() {
+            if (timerInterval) clearInterval(timerInterval);
+            hideAll();
+            document.getElementById('end-screen').classList.remove('hidden');
+            document.getElementById('final-score').textContent = `${score} pts`;
+
+            const pct = correctCount / TOTAL_ROUNDS;
+            let grade, message;
+            if (pct === 1) {
+                grade = '🏆 Urinal Grandmaster';
+                message = 'Flawless! You have mastered the ancient art of urinal etiquette!';
+                spawnConfetti(80);
+            } else if (pct >= 0.8) {
+                grade = '🥇 Etiquette Expert';
+                message = 'Impressive! The bathroom is safe with you.';
+                spawnConfetti(40);
+            } else if (pct >= 0.6) {
+                grade = '🥈 Decent Human';
+                message = 'A few awkward moments, but mostly solid choices.';
+            } else if (pct >= 0.4) {
+                grade = '🥉 Needs Practice';
+                message = 'You might be making some people uncomfortable...';
+            } else {
+                grade = '😬 Social Menace';
+                message = 'Please reconsider your life choices.';
+            }
+
+            document.getElementById('grade').textContent = grade;
+            document.getElementById('end-message').textContent = message;
+            document.getElementById('end-stats').textContent = `Correct: ${correctCount}/${TOTAL_ROUNDS} | Best Streak: ${maxStreak}`;
+
+            // Leaderboard
+            const newRecord = isNewHighScore(score);
+            const recordEl = document.getElementById('new-record');
+            const inputArea = document.getElementById('name-input-area');
+
+            if (newRecord) {
+                recordEl.classList.remove('hidden');
+            } else {
+                recordEl.classList.add('hidden');
+            }
+
+            inputArea.classList.remove('hidden');
+            const lastName = localStorage.getItem('urinal_game_last_name') || '';
+            document.getElementById('player-name').value = lastName;
+
+            renderLeaderboard('end-leaderboard');
+        };
+
+        // Render leaderboard on start screen on load
+        renderLeaderboard('start-leaderboard');
+    </script>
+</body>
+</html>
